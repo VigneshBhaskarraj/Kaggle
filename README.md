@@ -61,8 +61,9 @@ python app.py                # http://127.0.0.1:7860 — section-aware chunking 
 python app.py --share        # also creates a temporary public Gradio link
 ```
 
-**Google Colab:** upload the repository (or `!git clone` it), open the notebook and *Run all*. The first cell installs
-the pinned dependencies; the key cell prompts for the API key securely. The full run makes a few dozen GPT-3.5 Turbo
+**Google Colab:** upload the repository (or `!git clone` it) — or just the notebook on its own: it is self-contained.
+The first cell installs the pinned dependencies, the key cell prompts for the API key securely, and if
+`data/nestle_hr_policy.pdf` is absent the notebook downloads the published PDF and verifies its checksum. The full run makes a few dozen GPT-3.5 Turbo
 calls over a 14 000-character document — a few cents.
 
 ## How it works

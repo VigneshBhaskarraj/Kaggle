@@ -20,6 +20,7 @@ import getpass
 import hashlib
 import os
 import re
+import urllib.request
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -83,11 +84,19 @@ def resolve_llm_model(model: str = LLM_MODEL) -> str:
 
 
 # %% [loading]
-def load_pages(pdf_path: Path = PDF_PATH) -> list[Document]:
-    """PyPDFLoader: one Document per page, with 0-based `page` metadata."""
+def load_pages(pdf_path: Path = PDF_PATH, source_url: str = PDF_SOURCE_URL) -> list[Document]:
+    """PyPDFLoader: one Document per page, with 0-based `page` metadata.
+
+    If the file is missing (e.g. only the notebook was uploaded to the LMS or Colab), the published policy is
+    downloaded from nestle.com first; `verify_pdf` then confirms it is byte-for-byte the expected document.
+    """
     pdf_path = Path(pdf_path)
     if not pdf_path.exists():
-        raise FileNotFoundError(f"PDF not found at {pdf_path.resolve()} — see README.md")
+        print(f"{pdf_path} not found — downloading the published policy from {source_url} …")
+        pdf_path.parent.mkdir(parents=True, exist_ok=True)
+        request = urllib.request.Request(source_url, headers={"User-Agent": "Mozilla/5.0 (nestle-hr-assistant)"})
+        with urllib.request.urlopen(request, timeout=60) as response:
+            pdf_path.write_bytes(response.read())
     return PyPDFLoader(str(pdf_path)).load()
 
 
